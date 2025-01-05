@@ -1,0 +1,15 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="Number formatting" type="NodeJsTestRunner">
+    <node-interpreter value="project" />
+    <working-dir value="$PROJECT_DIR$" />
+    <language value="TYPE_SCRIPT" />
+    <typescript-loader value="TSX" />
+    <envs />
+    <scope-kind value="SUITE" />
+    <test-file value="$PROJECT_DIR$/test/number-formatter.test.ts" />
+    <test-names>
+      <test-name value="Number formatting" />
+    </test-names>
+    <method v="2" />
+  </configuration>
+</component>
