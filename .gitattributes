@@ -1,0 +1,19 @@
+*.xml           text eol=lf
+*.work          text eol=lf
+*.sum           text eol=lf
+*.sh            text eol=lf
+*.md            text eol=lf
+*.plantuml      text eol=lf
+*.json          text eol=lf
+*.drawio        text eol=lf
+*.html          text eol=lf
+.gitkeep        text eol=lf
+.gitignore      text eol=lf
+.gitattributes  text eol=lf
+.dockerignore   text eol=lf
+*.mod           text eol=lf
+
+*.ts            text eol=lf
+*.scss          text eol=lf
+*.scss          text eol=lf
+*.yml           text eol=lf

@@ -1,0 +1,17 @@
+{
+	"name": "@code-art-eg/globalite",
+	"version": "0.1.0",
+	"description": "A globalization library inspired by Globalize library but using Intl API",
+	"repository": "https://github.com/code-art-eg/globalite",
+	"author": "Sherif Elmetainy (Code Art)",
+	"license": "MIT",
+
+	"main": "dist/index.js",
+	"scripts": {
+		"build": "tsc"
+	},
+	"dependencies": {},
+	"devDependencies": {
+	},
+	"private": false
+}
