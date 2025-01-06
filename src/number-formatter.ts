@@ -1,11 +1,33 @@
 export type NumberFormatter = (value: number) => string;
 
+/**
+ * Creates a number formatter function based on the specified locale and options.
+ *
+ * @param {string} locale - The locale to use for formatting.
+ * @param {Intl.NumberFormatOptions | string} [options] - The formatting options or specifier string.
+ * @returns {NumberFormatter} A function that formats a number according to the specified locale and options.
+ * @throws {Error} If the currency code in the specifier is invalid.
+ * @throws {Error} If the number format specifier is invalid.
+ *
+ * Number format specifiers:
+ * - `n` or `N`: Formats a number with grouping separators.
+ * - `cUSD` or `CUSD`: Formats a number as currency with the specified currency code (USD).
+ * - `d` or `D`: Formats a number as an integer with the specified number of digits.
+ * - `e` or `E`: Formats a number in scientific notation with the specified number of digits.
+ * - `f` or `F`: Formats a number as a fixed-point number with the specified number of digits.
+ * - `g` or `G`: Formats a number in compact notation with the specified number of significant digits.
+ * - `p` or `P`: Formats a number as a percentage with the specified number of digits.
+ * - `b` or `B`: Formats a number in binary.
+ * - `x`: Formats a number in hexadecimal.
+ * - `X`: Formats a number in hexadecimal using uppercase letters.
+ * - `r` or `R`: Formats a number as a string.
+ */
 export function numberFormatter(
 	locale: string,
 	options?: Intl.NumberFormatOptions | string
 ): NumberFormatter {
 	if (!options) {
-		options = 'd';
+		options = 'n';
 	}
 	if (typeof options === 'string') {
 		return getFormatterFromSpecifiers(locale, options);
@@ -14,27 +36,88 @@ export function numberFormatter(
 }
 
 const formatterCache = new Map<string, NumberFormatter>();
+const currencyRegex = /^[A-Z]{3}$/;
 
 function getFormatterFromSpecifiers(
 	locale: string,
 	specifier: string
 ): NumberFormatter {
 	const s = specifier[0];
+	const currency = s === 'c' || s === 'C' ? specifier.slice(1, 4) : undefined;
+	let i = 1;
+	if (currency) {
+		if (currency.length !== 3 || !currencyRegex.test(currency)) {
+			throw new Error('Invalid currency code');
+		}
+		i = 4;
+	}
 	const digits =
-		specifier.length > 1 ? parseInt(specifier.slice(1), 10) : undefined;
-	if (digits !== undefined && (Number.isNaN(digits) || digits < 0)) {
+		specifier.length > i ? parseInt(specifier.slice(i), 10) : undefined;
+	if (
+		digits !== undefined &&
+		(Number.isNaN(digits) ||
+			digits < 0 ||
+			digits > 100 ||
+			s === 'r' ||
+			s === 'R')
+	) {
 		throw new Error(`Invalid number format specifier: ${specifier}`);
 	}
-	const localeIndependent = 'bBxX'.indexOf(s) >= 0;
-	const key = localeIndependent ? specifier : `${locale}/${specifier}`;
+	const localeIndependent = 'bBxXrR'.indexOf(s) >= 0;
+	const key = localeIndependent
+		? specifier
+		: `${locale}/${specifier.toLowerCase()}`;
 
 	let formatter = formatterCache.get(key);
 	if (!formatter) {
 		if (localeIndependent) {
 			formatter = getLocaleIndependentFormatter(s, digits);
 		} else {
-			const options = getOptionsFromSpecifier(s, digits);
-			formatter = Intl.NumberFormat(locale, options).format;
+			if (s === 'd' || s === 'D') {
+				const options = getOptionsFromSpecifier(s, currency, digits);
+				const captured = Intl.NumberFormat(locale, options).format;
+				formatter = (value: number) => {
+					throwIfNotInteger(value);
+					return captured(value);
+				};
+			}
+			if (s === 'g' || s === 'G') {
+				const fixedOptions: Intl.NumberFormatOptions = {
+					style: 'decimal',
+					maximumSignificantDigits: digits,
+					maximumFractionDigits: 100,
+					useGrouping: false,
+				};
+				const scientificOptions: Intl.NumberFormatOptions = {
+					style: 'decimal',
+					notation: 'scientific',
+					maximumSignificantDigits: digits,
+					maximumFractionDigits: 100,
+					useGrouping: false,
+				};
+				const fixedFormatter = Intl.NumberFormat(
+					locale,
+					fixedOptions
+				).format;
+				const scientificFormatter = Intl.NumberFormat(
+					locale,
+					scientificOptions
+				).format;
+
+				formatter = (value: number) => {
+					if (value === 0) {
+						return fixedFormatter(value);
+					}
+					const fixed = fixedFormatter(value);
+					const scientific = scientificFormatter(value);
+					return fixed.length < scientific.length
+						? fixed
+						: scientific;
+				};
+			} else {
+				const options = getOptionsFromSpecifier(s, currency, digits);
+				formatter = Intl.NumberFormat(locale, options).format;
+			}
 		}
 		formatterCache.set(key, formatter);
 	}
@@ -79,7 +162,9 @@ function getLocaleIndependentFormatter(
 	specifier: string,
 	digits: number | undefined
 ): NumberFormatter {
-	if (specifier === 'b' || specifier === 'B') {
+	if (specifier === 'r' || specifier === 'R') {
+		return value => value.toString();
+	} else if (specifier === 'b' || specifier === 'B') {
 		return getIntegerFormatter(2, digits);
 	} else if (specifier === 'x') {
 		return getIntegerFormatter(16, digits);
@@ -94,15 +179,70 @@ function getLocaleIndependentFormatter(
 
 function getOptionsFromSpecifier(
 	specifier: string,
+	currency: string | undefined,
 	digits: number | undefined
 ): Intl.NumberFormatOptions {
-	if (specifier === '' || specifier === 'd') {
+	if (specifier === 'c' || specifier === 'C') {
 		return {
-			useGrouping: true,
+			style: 'currency',
+			currencySign: 'accounting',
+			currency: currency,
 			maximumFractionDigits: digits,
+			minimumFractionDigits: digits,
 		};
 	}
 
-	// TODO: Implement this function
+	if (specifier === 'd' || specifier === 'D') {
+		return {
+			useGrouping: false,
+			minimumIntegerDigits: digits,
+		};
+	}
+
+	if (specifier === 'e' || specifier === 'E') {
+		return {
+			style: 'decimal',
+			notation: 'scientific',
+			maximumFractionDigits: digits || 6,
+			minimumFractionDigits: digits,
+		};
+	}
+
+	if (specifier === 'f' || specifier === 'F') {
+		return {
+			style: 'decimal',
+			maximumFractionDigits: digits ?? 2,
+			minimumFractionDigits: digits ?? 2,
+			useGrouping: false,
+		};
+	}
+
+	if (specifier === 'n' || specifier === 'N') {
+		return {
+			style: 'decimal',
+			maximumFractionDigits: digits,
+			minimumFractionDigits: digits,
+			useGrouping: true,
+		};
+	}
+
+	if (specifier === 'g' || specifier === 'G') {
+		return {
+			style: 'decimal',
+			notation: 'compact',
+			maximumSignificantDigits: digits,
+			useGrouping: false,
+		};
+	}
+
+	if (specifier === 'p' || specifier === 'P') {
+		return {
+			style: 'percent',
+			maximumFractionDigits: digits ?? 2,
+			minimumFractionDigits: digits ?? 2,
+			useGrouping: true,
+		};
+	}
+
 	throw new Error(`Invalid number format specifier: ${specifier}`);
 }
