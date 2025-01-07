@@ -3,33 +3,38 @@ import { getOptionsFromSpecifier, parseNumberSpecifier } from './numbers';
 export type NumberFormatter = (value: number) => string;
 
 /**
+ * Creates a number formatter function based on the specified locale.
+ *
+ * @param {string} locale - The locale to use for formatting.
+ * @returns {NumberFormatter} A function that formats a number according to the specified locale.
+ */
+export function numberFormatter(locale: string): NumberFormatter;
+
+/**
+ * Creates a number formatter function based on the specified locale and specifier.
+ *
+ * @param {string} locale - The locale to use for formatting.
+ * @param {string} specifier - The formatting specifier string.
+ * @returns {NumberFormatter} A function that formats a number according to the specified locale and specifier.
+ * @throws {Error} If the number format specifier is invalid.
+ */
+export function numberFormatter(
+	locale: string,
+	specifier: string
+): NumberFormatter;
+
+/**
  * Creates a number formatter function based on the specified locale and options.
  *
  * @param {string} locale - The locale to use for formatting.
- * @param {Intl.NumberFormatOptions | string} [options] - The formatting options or specifier string.
+ * @param {Intl.NumberFormatOptions} options - The formatting options.
  * @returns {NumberFormatter} A function that formats a number according to the specified locale and options.
- * @throws {Error} If the currency code in the specifier is invalid.
- * @throws {Error} If the number format specifier is invalid.
- *
- * Number format specifiers:
- * - `n` or `N`: Formats a number with grouping separators.
- * - `cUSD` or `CUSD`: Formats a number as currency with the specified currency code (USD).
- * - `d` or `D`: Formats a number as an integer with the specified number of digits.
- * - `e` or `E`: Formats a number in scientific notation with the specified number of digits.
- * - `f` or `F`: Formats a number as a fixed-point number with the specified number of digits.
- * - `g` or `G`: Formats a number in compact notation with the specified number of significant digits.
- * - `p` or `P`: Formats a number as a percentage with the specified number of digits.
- * - `b` or `B`: Formats a number in binary.
- * - `x`: Formats a number in hexadecimal.
- * - `X`: Formats a number in hexadecimal using uppercase letters.
- * - `r` or `R`: Formats a number as a string.
- *
- * @remarks
- * The formatters returned when using a format specifier string are cached to improve performance.
- * So it's recommended to pass a format specifier string when possible.
- * If an options object is provided, a new formatter will be created each time.
- * It's recommended to cache the formatter if the same options will be used multiple times.
  */
+export function numberFormatter(
+	locale: string,
+	options: Intl.NumberFormatOptions
+): NumberFormatter;
+
 export function numberFormatter(
 	locale: string,
 	options?: Intl.NumberFormatOptions | string
@@ -40,7 +45,8 @@ export function numberFormatter(
 	if (typeof options === 'string') {
 		return getFormatterFromSpecifiers(locale, options);
 	}
-	return Intl.NumberFormat(locale, options).format;
+	const intl = new Intl.NumberFormat(locale, options);
+	return intl.format.bind(intl);
 }
 
 const formatterCache = new Map<string, NumberFormatter>();
@@ -59,7 +65,8 @@ function getFormatterFromSpecifiers(
 		} else {
 			if (s === 'd' || s === 'D') {
 				const options = getOptionsFromSpecifier(s, currency, digits);
-				const captured = Intl.NumberFormat(locale, options).format;
+				const intl = new Intl.NumberFormat(locale, options);
+				const captured = intl.format.bind(intl);
 				formatter = (value: number) => {
 					throwIfNotInteger(value);
 					return captured(value);
@@ -78,14 +85,14 @@ function getFormatterFromSpecifiers(
 					maximumFractionDigits: 100,
 					useGrouping: false,
 				};
-				const fixedFormatter = Intl.NumberFormat(
-					locale,
-					fixedOptions
-				).format;
-				const scientificFormatter = Intl.NumberFormat(
+				const fixedIntl = new Intl.NumberFormat(locale, fixedOptions);
+				const fixedFormatter = fixedIntl.format.bind(fixedIntl);
+				const scientificIntl = new Intl.NumberFormat(
 					locale,
 					scientificOptions
-				).format;
+				);
+				const scientificFormatter =
+					scientificIntl.format.bind(scientificIntl);
 
 				formatter = (value: number) => {
 					if (value === 0) {
@@ -99,7 +106,8 @@ function getFormatterFromSpecifiers(
 				};
 			} else {
 				const options = getOptionsFromSpecifier(s, currency, digits);
-				formatter = Intl.NumberFormat(locale, options).format;
+				const intl = new Intl.NumberFormat(locale, options);
+				formatter = intl.format.bind(intl);
 			}
 		}
 		formatterCache.set(key, formatter);

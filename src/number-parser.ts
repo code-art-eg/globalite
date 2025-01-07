@@ -4,11 +4,33 @@ import { getOptionsFromSpecifier, parseNumberSpecifier } from './numbers';
 export type NumberParser = (value: string) => number | null;
 
 /**
+ * Creates a number parsing function based on the specified locale and specifier.
+ *
+ * @param {string} locale - The locale to use for parsing.
+ * @param {string} specifier - The parsing specifier string.
+ * @returns {NumberParser} A function that parses a number according to the specified locale and specifier.
+ * @throws {Error} If the number format specifier is invalid.
+ */
+export function numberParser(locale: string, specifier: string): NumberParser;
+
+/**
  * Creates a number parsing function based on the specified locale and options.
  *
  * @param {string} locale - The locale to use for parsing.
- * @param {Intl.NumberFormatOptions | string} [options] - The parsing options or specifier string.
- * @returns {NumberParser} A function that parsing a number according to the specified locale and options.
+ * @param {Intl.NumberFormatOptions} options - The parsing options.
+ * @returns {NumberParser} A function that parses a number according to the specified locale and options.
+ */
+export function numberParser(
+	locale: string,
+	options: Intl.NumberFormatOptions
+): NumberParser;
+
+/**
+ * Creates a number parsing function based on the specified locale and options.
+ *
+ * @param {string} locale - The locale to use for parsing.
+ * @param {Intl.NumberFormatOptions | string} [optionsOrSpecifier] - The parsing options or specifier string.
+ * @returns {NumberParser} A function that parses a number according to the specified locale and options.
  * @throws {Error} If the currency code in the specifier is invalid.
  * @throws {Error} If the number format specifier is invalid.
  *
@@ -21,7 +43,7 @@ export type NumberParser = (value: string) => number | null;
  * - `g` or `G`: Parses a number in compact notation with the specified number of significant digits.
  * - `p` or `P`: Parses a number as a percentage with the specified number of digits.
  * - `b` or `B`: Parses an integer number in binary.
- * - `x` or `X`: Parses an integer  in hexadecimal.
+ * - `x` or `X`: Parses an integer in hexadecimal.
  * - `r` or `R`: Parses a number as a round trip format (using parseFloat).
  *
  * @remarks
@@ -29,6 +51,11 @@ export type NumberParser = (value: string) => number | null;
  * When passing an options object, a new parser will be created each time.
  * It's recommended to cache the parser if the same options are used multiple times.
  */
+export function numberParser(
+	locale: string,
+	optionsOrSpecifier?: Intl.NumberFormatOptions | string
+): NumberParser;
+
 export function numberParser(
 	locale: string,
 	options?: Intl.NumberFormatOptions | string
@@ -47,6 +74,7 @@ function getNumberParserFromOptions(
 	options: Intl.NumberFormatOptions
 ): NumberParser {
 	const fmt = new Intl.NumberFormat(locale, options);
+
 	const digits = getDigits(locale);
 
 	const rules: Rule[] = [];
