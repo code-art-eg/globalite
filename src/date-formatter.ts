@@ -104,8 +104,8 @@ function getFormatterFromSpecifier(
 				locale,
 				options
 			).formatToParts.bind(intl);
-			const nFmt = numberFormatter(locale, 'd');
-			const nPrs = numberParser(locale, 'd');
+			const nFmt = numberFormatter(locale, 'd4');
+			const nPrs = numberParser(locale, 'd4');
 			formatter = (date: Date) => {
 				const formatted = captured(date);
 				return formatted.reduce((ac, cv) => {
