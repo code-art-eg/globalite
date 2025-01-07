@@ -58,8 +58,7 @@ function getFormatterFromSpecifiers(
 					throwIfNotInteger(value);
 					return captured(value);
 				};
-			}
-			if (s === 'g' || s === 'G') {
+			} else if (s === 'g' || s === 'G') {
 				const fixedOptions: Intl.NumberFormatOptions = {
 					style: 'decimal',
 					maximumSignificantDigits: digits,

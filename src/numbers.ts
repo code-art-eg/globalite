@@ -35,7 +35,9 @@ export function parseNumberSpecifier(
 	}
 	const localeIndependent = 'bBxXrR'.indexOf(s) >= 0;
 	const key = localeIndependent
-		? specifier
+		? specifier === 'X'
+			? 'X'
+			: specifier.toLowerCase()
 		: `${locale}/${specifier.toLowerCase()}`;
 	return { s, currency, digits, localeIndependent, key };
 }
@@ -59,6 +61,8 @@ export function getOptionsFromSpecifier(
 		return {
 			useGrouping: false,
 			minimumIntegerDigits: digits,
+			minimumFractionDigits: 0,
+			maximumFractionDigits: 0,
 		};
 	}
 

@@ -13,16 +13,16 @@ export type NumberParser = (value: string) => number | null;
  * @throws {Error} If the number format specifier is invalid.
  *
  * Number format specifiers:
- * - `n` or `N`: Formats a number with grouping separators.
- * - `cUSD` or `CUSD`: Formats a number as currency with the specified currency code (USD).
- * - `d` or `D`: Parses a number as an integer with the specified number of digits.
+ * - `n` or `N`: Parses a number with grouping separators.
+ * - `cUSD` or `CEUR`: Formats a number as currency with the specified currency code (USD).
+ * - `d` or `D`: Parses an integer number as an integer with the specified number of digits.
  * - `e` or `E`: Parses a number in scientific notation with the specified number of digits.
  * - `f` or `F`: Parses a number as a fixed-point number with the specified number of digits.
  * - `g` or `G`: Parses a number in compact notation with the specified number of significant digits.
  * - `p` or `P`: Parses a number as a percentage with the specified number of digits.
- * - `b` or `B`: Parses a number in binary.
- * - `x` or `X`: Parses a number in hexadecimal.
- * - `r` or `R`: Parses a number as a string (using parseFloat).
+ * - `b` or `B`: Parses an integer number in binary.
+ * - `x` or `X`: Parses an integer  in hexadecimal.
+ * - `r` or `R`: Parses a number as a round trip format (using parseFloat).
  */
 export function numberParser(
 	locale: string,
@@ -79,6 +79,9 @@ function getNumberParserFromOptions(
 
 const digitsMap = new Map<string, string[]>();
 const parserCache = new Map<string, NumberParser>();
+const binaryRx = /^[01]+$/;
+const hexRx = /^[0-9A-F]+$/i;
+const numberRx = /^\s*[+-]?(?:\d+\.\d+|\.\d+)\s*(?:[eE][+-]?\d+)?\s*$/;
 
 function getParserFromSpecifiers(
 	locale: string,
@@ -135,18 +138,27 @@ function getParserFromSpecifiers(
 function getLocaleIndependentParser(specifier: string): NumberParser {
 	if (specifier === 'x' || specifier === 'X') {
 		return (value: string) => {
+			if (!hexRx.test(value)) {
+				return null;
+			}
 			const n = parseInt(value, 16);
 			return isNaN(n) ? null : n;
 		};
 	}
 	if (specifier === 'r' || specifier === 'R') {
 		return (value: string) => {
-			const n = parseInt(value, 10);
+			if (!numberRx.test(value)) {
+				return null;
+			}
+			const n = parseFloat(value);
 			return isNaN(n) ? null : n;
 		};
 	}
 	if (specifier === 'b' || specifier === 'B') {
 		return (value: string) => {
+			if (!binaryRx.test(value)) {
+				return null;
+			}
 			const n = parseInt(value, 2);
 			return isNaN(n) ? null : n;
 		};
@@ -366,6 +378,18 @@ function matchRule(str: string, rule: Rule): [boolean, string] {
 	return [true, str];
 }
 
+function findLastIndex<T>(
+	array: T[],
+	predicate: (value: T, index: number, array: T[]) => boolean
+): number {
+	for (let i = array.length - 1; i >= 0; i--) {
+		if (predicate(array[i], i, array)) {
+			return i;
+		}
+	}
+	return -1;
+}
+
 function getParseProperties(parts: Intl.NumberFormatPart[]): ParseProperties {
 	let index = 0;
 	let prefix = '';
@@ -382,25 +406,27 @@ function getParseProperties(parts: Intl.NumberFormatPart[]): ParseProperties {
 	}
 
 	if (prefix) {
-		props.prefixRx = getStartsWithRe(looseMatch(prefix));
+		props.prefixRx = getStartsWithRe(prefix);
 	}
 	// index is now at the first part of the number
 	// should not be at the end of the parts array
 	if (isPartNanOrInfinity(parts[index])) {
-		props.numberRx = getStartsWithRe(looseMatch(parts[index].value));
+		props.numberRx = getStartsWithRe(parts[index].value);
 		index++;
 	} else {
-		while (index < parts.length && isPartOfNumber(parts[index])) {
-			if (parts[index].type === 'group') {
-				props.groupSymbol = parts[index].value;
-			} else if (parts[index].type === 'decimal') {
-				props.decimalSymbol = parts[index].value;
-			} else if (parts[index].type === 'exponentSeparator') {
-				props.exponentSymbol = parts[index].value;
-			} else if (parts[index].type === 'exponentMinusSign') {
-				props.exponentMinusSymbol = parts[index].value;
-			}
+		const lastPartOfNumber = findLastIndex(parts, isPartOfNumber);
+		const numberParts = parts.slice(index, lastPartOfNumber + 1);
 
+		for (const part of numberParts) {
+			if (part.type === 'group') {
+				props.groupSymbol = part.value;
+			} else if (part.type === 'decimal') {
+				props.decimalSymbol = part.value;
+			} else if (part.type === 'exponentSeparator') {
+				props.exponentSymbol = part.value;
+			} else if (part.type === 'exponentMinusSign') {
+				props.exponentMinusSymbol = part.value;
+			}
 			index++;
 		}
 	}
@@ -412,7 +438,7 @@ function getParseProperties(parts: Intl.NumberFormatPart[]): ParseProperties {
 	}
 
 	if (suffix) {
-		props.suffixRx = getEndsWithRe(looseMatch(suffix));
+		props.suffixRx = getEndsWithRe(suffix);
 	}
 
 	return props;

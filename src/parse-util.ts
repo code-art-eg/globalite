@@ -8,7 +8,7 @@ export function looseMatch(val: string): string {
 	return val
 		.replace(bidiMarkersRx, '')
 		.replace(dashRx, '-')
-		.replace(spaceSeparatorRx, ' ');
+		.replace(spaceSeparatorRx, '');
 }
 
 export function regexpEscape(str: string) {
@@ -16,9 +16,9 @@ export function regexpEscape(str: string) {
 }
 
 export function getStartsWithRe(str: string): RegExp {
-	return new RegExp(`^${regexpEscape(str)}`);
+	return new RegExp(`^${regexpEscape(looseMatch(str))}`);
 }
 
 export function getEndsWithRe(str: string): RegExp {
-	return new RegExp(`${regexpEscape(str)}$`);
+	return new RegExp(`${regexpEscape(looseMatch(str))}$`);
 }

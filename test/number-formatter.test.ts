@@ -16,7 +16,7 @@ describe('Default number formatting with no specifier', () => {
 
 	it('Correctly formats in ar-EG locale using default specifier', () => {
 		const formatter = numberFormatter('ar-EG');
-		assert.strictEqual(formatter(1234567.89), '1.234.567,89');
+		assert.strictEqual(formatter(1234567.89), '١٬٢٣٤٬٥٦٧٫٨٩');
 	});
 });
 
