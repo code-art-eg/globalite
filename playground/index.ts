@@ -1,7 +1,7 @@
-import { numberFormatter } from '../src/number-formatter';
+import { numberParser } from '../src/number-parser';
 
-const formatter = numberFormatter('en', 'd');
+const parser = numberParser('ar-EG', 'f');
 
-const result = formatter(123456789.12345679);
+const result = parser('-١٢٣٤');
 
 console.log(result);
