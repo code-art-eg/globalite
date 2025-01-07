@@ -1,0 +1,12 @@
+{
+	"extends": "../tsconfig.base.json",
+	"include": [
+		"./**/*.ts",
+		"../src/**/*.ts"
+	],
+	"compilerOptions": {
+		"allowSyntheticDefaultImports": true,
+		"esModuleInterop": true,
+		"rootDir": "..",
+	},
+}

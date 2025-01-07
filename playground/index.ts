@@ -1,4 +1,4 @@
-import { numberParser } from '../src/number-parser';
+import { numberParser } from '@code-art-eg/globalite';
 
 const parser = numberParser('ar-EG', 'f');
 

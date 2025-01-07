@@ -23,6 +23,11 @@ export type NumberParser = (value: string) => number | null;
  * - `b` or `B`: Parses an integer number in binary.
  * - `x` or `X`: Parses an integer  in hexadecimal.
  * - `r` or `R`: Parses a number as a round trip format (using parseFloat).
+ *
+ * @remarks
+ * When using a string specifier, the parser will be cached.
+ * When passing an options object, a new parser will be created each time.
+ * It's recommended to cache the parser if the same options are used multiple times.
  */
 export function numberParser(
 	locale: string,

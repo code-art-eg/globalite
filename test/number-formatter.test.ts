@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import { describe, it } from 'node:test';
 
-import { numberFormatter } from '../src/number-formatter';
+import { numberFormatter } from '@code-art-eg/globalite';
 
 describe('Default number formatting with no specifier', () => {
 	it('Correctly formats in en-US locale using default specifier', () => {

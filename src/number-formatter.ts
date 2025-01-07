@@ -23,6 +23,12 @@ export type NumberFormatter = (value: number) => string;
  * - `x`: Formats a number in hexadecimal.
  * - `X`: Formats a number in hexadecimal using uppercase letters.
  * - `r` or `R`: Formats a number as a string.
+ *
+ * @remarks
+ * The formatters returned when using a format specifier string are cached to improve performance.
+ * So it's recommended to pass a format specifier string when possible.
+ * If an options object is provided, a new formatter will be created each time.
+ * It's recommended to cache the formatter if the same options will be used multiple times.
  */
 export function numberFormatter(
 	locale: string,

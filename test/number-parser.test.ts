@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import { describe, it } from 'node:test';
 
-import { numberParser } from '../src/number-parser';
+import { numberParser } from '@code-art-eg/globalite';
 
 describe('Default number parsing with no specifier', () => {
 	it('Correctly parses using en-US locale using default specifier', () => {

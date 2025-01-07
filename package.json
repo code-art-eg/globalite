@@ -2,12 +2,21 @@
 	"name": "@code-art-eg/globalite",
 	"version": "0.1.0",
 	"description": "A globalization library inspired by Globalize library but using Intl API",
-	"repository": "https://github.com/code-art-eg/globalite",
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/code-art-eg/globalite.git"
+	},
+	"engines": {
+		"yarn": ">=1.22.4 <2",
+		"npm": "Please use yarn instead of NPM to install dependencies"
+	},
+	"bugs": "https://github.com/code-art-eg/globalite/issues",
+	"homepage": "https://github.com/code-art-eg/globalite",
 	"author": "Sherif Elmetainy (Code Art)",
 	"license": "MIT",
-	"main": "dist/index.js",
+	"main": "index.js",
 	"scripts": {
-		"build": "tsc",
+		"build": "rimraf ./build && tsc && cpy README.md build && cpy LICENSE build && cd tools/edit-pkg-json && node --import tsx index.ts",
 		"lint": "eslint .",
 		"test": "node --import tsx/esm --test test/**/*.test.ts",
 		"playground": "node --import tsx/esm playground/index.ts"
@@ -16,8 +25,10 @@
 	"devDependencies": {
 		"@eslint/js": "^9.17.0",
 		"@types/node": "^22.10.5",
+		"cpy-cli": "^5.0.0",
 		"eslint": "^9.17.0",
 		"prettier": "^3.4.2",
+		"rimraf": "^6.0.1",
 		"tsx": "^4.19.2",
 		"typescript": "^5.7.2",
 		"typescript-eslint": "^8.19.0"

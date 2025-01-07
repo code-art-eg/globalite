@@ -1,0 +1,17 @@
+{
+	"compilerOptions": {
+		"target": "es2016",
+		"module": "ES2022",
+		"forceConsistentCasingInFileNames": true,
+		"strict": true,
+		"skipLibCheck": true,
+		"outDir": "build",
+		"declaration": true,
+		"paths": {
+			"@code-art-eg/globalite": ["./src/index"]
+		}
+	},
+	"include": [
+		"src"
+	]
+}
