@@ -80,6 +80,34 @@ if (number !== null) {
 }
 ```
 
+### Date Formatting
+
+```typescript
+import { dateFormatter } from '@code-art-eg/globalite';
+
+const formatter = dateFormatter('en-US', 'd'); // US locale, short date format
+
+const formattedDate = formatter(new Date()); // returns '12/31/2021'
+```
+
+### Date Parsing
+
+```typescript
+import { dateParser } from '@code-art-eg/globalite';
+
+const parser = dateParser('en-US', 'd'); // US locale, short date format
+
+const date = parser('12/31/2021'); // returns a Date object
+```
+
+## Known Issues
+
+- The library doesn't support parsing dates in different calendar systems. It only supports the Gregorian calendar.
+- Parsing a date with a different time zone than the system time zone will return a date 
+object with the same time zone as the system time zone and same clock time as the input date string.
+For example, parsing a date string New York time at 12:00 PM, while the system time zone is Cairo time, 
+returns a date object with Cairo time at 12:00 PM but should be 7:00 PM.
+
 
 ## Credits
 

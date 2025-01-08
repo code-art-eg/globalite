@@ -1,6 +1,6 @@
 {
 	"name": "@code-art-eg/globalite",
-	"version": "0.1.0",
+	"version": "0.2.0",
 	"description": "A globalization library inspired by Globalize library but using Intl API",
 	"repository": {
 		"type": "git",
