@@ -1,4 +1,6 @@
 import { getOptionsFromSpecifier, parseDateSpecifier } from './dates';
+import { numberParser, NumberParser } from './number-parser';
+import { compareStringsAtIndex } from './parse-util';
 
 export type DateParser = (date: string) => Date | null;
 
@@ -27,14 +29,273 @@ export function dateParser(
 	return getDateParserFromOptions(locale, options);
 }
 
+const digitRx = /\p{Nd}/u;
+
+export type NumberKeys<T> = {
+	[K in keyof T]: T[K] extends number ? K : never;
+}[keyof T];
+
+type ParserState = {
+	year: number;
+	month: number;
+	day: number;
+	hour: number;
+	minute: number;
+	second: number;
+	ms: number;
+
+	isPM: boolean;
+	isAM: boolean;
+
+	input: string;
+	index: number;
+};
+
+type Matcher = (state: ParserState) => boolean;
+
+function getMonthMatcher(
+	fmt: (d: Date) => Intl.DateTimeFormatPart[],
+	parser: NumberParser
+): Matcher {
+	const months: string[] = [];
+	for (let i = 0; i < 12; i++) {
+		const date = new Date(2020, i, 1);
+		const parts = fmt(date);
+
+		const month = parts.find(part => part.type === 'month')?.value;
+
+		if (!month) {
+			throw new Error('Could not find month');
+		}
+		if (digitRx.test(month)) {
+			return s => {
+				return matchNumber(s, parser, 'month');
+			};
+		}
+		months.push(month);
+	}
+	return s => {
+		for (let i = 0; i < 12; i++) {
+			const cmp = compareStringsAtIndex(months[i], s.input, s.index);
+			if (cmp) {
+				s.index = cmp;
+				s.month = i + 1;
+				return true;
+			}
+		}
+		return false;
+	};
+}
+
+function getDayOfWeekMatcher(
+	fmt: (d: Date) => Intl.DateTimeFormatPart[]
+): Matcher {
+	const days: string[] = [];
+	for (let i = 0; i < 7; i++) {
+		const date = new Date(2020, 0, i + 1);
+		const parts = fmt(date);
+
+		const day = parts.find(part => part.type === 'weekday')?.value;
+		if (!day) {
+			throw new Error('Could not find day of week');
+		}
+		days.push(day.toLowerCase());
+	}
+	return s => {
+		for (let i = 0; i < 7; i++) {
+			const cmp = compareStringsAtIndex(days[i], s.input, s.index);
+			if (cmp !== false) {
+				s.index = cmp;
+				return true;
+			}
+		}
+		return false;
+	};
+}
+
+function getDayPeriodMatcher(
+	fmt: (d: Date) => Intl.DateTimeFormatPart[]
+): Matcher {
+	let date = new Date(2020, 0, 1, 2, 3, 4, 567);
+	let parts = fmt(date);
+
+	let period = parts.find(part => part.type === 'dayPeriod')?.value;
+	if (!period) {
+		throw new Error('Could not find day period');
+	}
+	const am = period.toLowerCase();
+
+	date = new Date(2020, 0, 1, 14, 3, 4, 567);
+	parts = fmt(date);
+
+	period = parts.find(part => part.type === 'dayPeriod')?.value;
+	if (!period) {
+		throw new Error('Could not find day period');
+	}
+	const pm = period.toLowerCase();
+	return s => {
+		let cmp = compareStringsAtIndex(am, s.input, s.index);
+		if (cmp !== false) {
+			s.index = cmp;
+			s.isAM = true;
+			return true;
+		}
+		cmp = compareStringsAtIndex(pm, s.input, s.index);
+		if (cmp !== false) {
+			s.index = cmp;
+			s.isPM = true;
+			return true;
+		}
+		return false;
+	};
+}
+
+function matchNumber(
+	s: ParserState,
+	parser: NumberParser,
+	key: NumberKeys<ParserState>
+): boolean {
+	let str = '';
+	while (s.index < s.input.length) {
+		if (!digitRx.test(s.input[s.index])) {
+			break;
+		}
+		str += s.input[s.index];
+		s.index++;
+	}
+	if (str === '') {
+		return false;
+	}
+	const num = parser(str);
+	if (num === null) {
+		return false;
+	}
+	s[key] = num;
+	return true;
+}
+
 function getDateParserFromOptions(
 	locale: string,
 	options: Intl.DateTimeFormatOptions
 ): DateParser {
-	console.log(
-		`getDateParserFromOptions: { locale: ${locale}, options: ${JSON.stringify(options)} }`
-	);
-	throw new Error('Not implemented');
+	const intl = new Intl.DateTimeFormat(locale, options);
+	const formatter = intl.formatToParts.bind(intl);
+	const parser = numberParser(locale, 'd');
+
+	const optionsNoTimeZone = { ...options, timeZone: undefined };
+	const intlNoTimeZone = new Intl.DateTimeFormat(locale, optionsNoTimeZone);
+	const formatterNoTimeZone =
+		intlNoTimeZone.formatToParts.bind(intlNoTimeZone);
+
+	const monthMatcher = getMonthMatcher(formatterNoTimeZone, parser);
+
+	const parts = formatter(new Date());
+
+	let dayOfWeekMatcher: Matcher | undefined;
+	let dayPeriodMatcher: Matcher | undefined;
+	if (parts.some(part => part.type === 'weekday')) {
+		dayOfWeekMatcher = getDayOfWeekMatcher(formatterNoTimeZone);
+	}
+	if (parts.some(part => part.type === 'dayPeriod')) {
+		dayPeriodMatcher = getDayPeriodMatcher(formatterNoTimeZone);
+	}
+
+	return (str: string) => {
+		const today = new Date();
+		const state: ParserState = {
+			year: today.getUTCFullYear(),
+			month: 0,
+			day: 1,
+			hour: 0,
+			minute: 0,
+			second: 0,
+			ms: 0,
+
+			isPM: false,
+			isAM: false,
+			input: str,
+			index: 0,
+		};
+
+		for (const part of parts) {
+			switch (part.type) {
+				case 'year':
+					if (!matchNumber(state, parser, 'year')) {
+						return null;
+					}
+					break;
+				case 'month':
+					if (!monthMatcher(state)) {
+						return null;
+					}
+					break;
+				case 'day':
+					if (!matchNumber(state, parser, 'day')) {
+						return null;
+					}
+					break;
+				case 'hour':
+					if (!matchNumber(state, parser, 'hour')) {
+						return null;
+					}
+					break;
+				case 'minute':
+					if (!matchNumber(state, parser, 'minute')) {
+						return null;
+					}
+					break;
+				case 'second':
+					if (!matchNumber(state, parser, 'second')) {
+						return null;
+					}
+					break;
+				case 'dayPeriod':
+					if (!dayPeriodMatcher!(state)) {
+						return null;
+					}
+					break;
+				case 'weekday':
+					if (!dayOfWeekMatcher!(state)) {
+						return null;
+					}
+					break;
+				default: {
+					const cmp = compareStringsAtIndex(
+						part.value,
+						str,
+						state.index
+					);
+					if (cmp === false) {
+						return null;
+					}
+					state.index = cmp;
+					break;
+				}
+			}
+		}
+
+		if (state.index !== str.length) {
+			return null;
+		}
+
+		if (state.isPM && state.hour < 12) {
+			state.hour += 12;
+		}
+
+		if (state.isAM && state.hour === 12) {
+			state.hour = 0;
+		}
+
+		return new Date(
+			state.year,
+			state.month - 1,
+			state.day,
+			state.hour,
+			state.minute,
+			state.second,
+			state.ms
+		);
+	};
 }
 
 const parserCache = new Map<string, DateParser>();

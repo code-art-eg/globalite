@@ -40,3 +40,81 @@ describe('Date Parser with locale independent formats"', () => {
 		assert.strictEqual(parser1, parser2);
 	});
 });
+
+describe('Date Parser with d format', () => {
+	it('Correctly parses date string with en-US locale', () => {
+		const parser = dateParser('en-US', 'd');
+		const date = parser('12/31/2020');
+		assert.deepStrictEqual(date, new Date(2020, 11, 31));
+	});
+
+	it('Correctly parses date string with de-DE locale', () => {
+		const parser = dateParser('de-DE', 'd');
+		const date = parser('31.12.2020');
+		assert.deepStrictEqual(date, new Date(2020, 11, 31));
+	});
+
+	it('Correctly parses date string with ar-EG locale', () => {
+		const parser = dateParser('ar-EG', 'd');
+		const date = parser('٣١/١٢/٢٠٢٠');
+		assert.deepStrictEqual(date, new Date(2020, 11, 31));
+	});
+
+	it('Returns null for invalid date string', () => {
+		const parser = dateParser('en-US', 'd');
+		const date = parser('invalid-date-string');
+		assert.strictEqual(date, null);
+	});
+});
+
+describe('Date Parser with D format', () => {
+	it('Correctly parses date string with en-US locale', () => {
+		const parser = dateParser('en-US', 'D');
+		const date = parser('Thursday, December 31, 2020');
+		assert.deepStrictEqual(date, new Date(2020, 11, 31));
+	});
+
+	it('Correctly parses date string with de-DE locale', () => {
+		const parser = dateParser('de-DE', 'D');
+		const date = parser('Donnerstag, 31. Dezember 2020');
+		assert.deepStrictEqual(date, new Date(2020, 11, 31));
+	});
+
+	it('Correctly parses date string with ar-EG locale', () => {
+		const parser = dateParser('ar-EG', 'D');
+		const date = parser('الخميس، ٣١ ديسمبر ٢٠٢٠');
+		assert.deepStrictEqual(date, new Date(2020, 11, 31));
+	});
+
+	it('Returns null for invalid date string', () => {
+		const parser = dateParser('en-US', 'D');
+		const date = parser('invalid-date-string');
+		assert.strictEqual(date, null);
+	});
+});
+
+describe('Date Parser with F format', () => {
+	it('Correctly parses date string with en-US locale', () => {
+		const parser = dateParser('en-US', 'F');
+		const date = parser('Thursday, December 31, 2020 at 12:34:56 PM');
+		assert.deepStrictEqual(date, new Date(2020, 11, 31, 12, 34, 56));
+	});
+
+	it('Correctly parses date string with de-DE locale', () => {
+		const parser = dateParser('de-DE', 'F');
+		const date = parser('Donnerstag, 31. Dezember 2020 um 12:34:56');
+		assert.deepStrictEqual(date, new Date(2020, 11, 31, 12, 34, 56));
+	});
+
+	it('Correctly parses date string with ar-EG locale', () => {
+		const parser = dateParser('ar-EG', 'F');
+		const date = parser('الخميس، ٣١ ديسمبر ٢٠٢٠ في ١٢:٣٤:٥٦ م');
+		assert.deepStrictEqual(date, new Date(2020, 11, 31, 12, 34, 56));
+	});
+
+	it('Returns null for invalid date string', () => {
+		const parser = dateParser('en-US', 'F');
+		const date = parser('invalid-date-string');
+		assert.strictEqual(date, null);
+	});
+});

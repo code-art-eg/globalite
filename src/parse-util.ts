@@ -22,3 +22,40 @@ export function getStartsWithRe(str: string): RegExp {
 export function getEndsWithRe(str: string): RegExp {
 	return new RegExp(`${regexpEscape(looseMatch(str))}$`);
 }
+
+export function compareStringsAtIndex(
+	token: string,
+	input: string,
+	index: number
+): number | false {
+	let i = 0;
+	let j = index;
+
+	while (spaceSeparatorRx.test(input[j]) || bidiMarkersRx.test(input[j])) {
+		j++;
+	}
+	while (spaceSeparatorRx.test(token[i]) || bidiMarkersRx.test(token[i])) {
+		i++;
+	}
+
+	while (i < token.length && j < input.length) {
+		if (spaceSeparatorRx.test(input[j]) || bidiMarkersRx.test(input[j])) {
+			j++;
+			continue;
+		}
+		if (spaceSeparatorRx.test(token[i]) || bidiMarkersRx.test(token[i])) {
+			i++;
+			continue;
+		}
+		if (token[i].toLowerCase() !== input[j].toLowerCase()) {
+			return false;
+		}
+		i++;
+		j++;
+	}
+
+	if (i === token.length) {
+		return j;
+	}
+	return false;
+}
