@@ -441,6 +441,16 @@ chalk@^4.0.0:
     ansi-styles "^4.1.0"
     supports-color "^7.1.0"
 
+cldr-core@^46.1.0:
+  version "46.1.0"
+  resolved "https://registry.yarnpkg.com/cldr-core/-/cldr-core-46.1.0.tgz#375d331ac3aaba3fbc422578206c03bfd76eb141"
+  integrity sha512-YWIbxgpO6fUais+FIm6Stl/KoAAhNJx4wDg2sg06QxK6GQ+i1iwdpCiyIJ7CTWduRuqUmRoaYpL/n5/8Q8ywxg==
+
+cldr-misc-full@^46.1.0:
+  version "46.1.0"
+  resolved "https://registry.yarnpkg.com/cldr-misc-full/-/cldr-misc-full-46.1.0.tgz#806760462fa8656f149c902991e7cc81264eed35"
+  integrity sha512-Prawv8u9yxXp0sQ+5qEVK/Rakv+Fl7hw9PFK1YFnnGAEJWH3BtzkNG4VST4e2pW2yzIbXW2bstzIY9iYI8OgVg==
+
 clean-stack@^4.0.0:
   version "4.2.0"
   resolved "https://registry.npmjs.org/clean-stack/-/clean-stack-4.2.0.tgz"
@@ -1094,7 +1104,7 @@ prelude-ls@^1.2.1:
 
 prettier@^3.4.2:
   version "3.4.2"
-  resolved "https://registry.npmjs.org/prettier/-/prettier-3.4.2.tgz"
+  resolved "https://registry.yarnpkg.com/prettier/-/prettier-3.4.2.tgz#a5ce1fb522a588bf2b78ca44c6e6fe5aa5a2b13f"
   integrity sha512-e9MewbtFo+Fevyuxn/4rrcDAaq0IYxPGLvObpQjiZBMAzB9IGmzlnG9RZy3FFas+eBMu2vA0CszMeduow5dIuQ==
 
 punycode@^2.1.0:
