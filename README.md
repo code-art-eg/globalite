@@ -100,6 +100,53 @@ const parser = dateParser('en-US', 'd'); // US locale, short date format
 const date = parser('12/31/2021'); // returns a Date object
 ```
 
+## Boolean Formatting
+
+```typescript
+import { booleanFormatter } from '@code-art-eg/globalite';
+
+const formatter = booleanFormatter('en-US');
+
+const formattedTrue = formatter(true); // returns 'yes'
+const formattedFalse = formatter(false); // returns 'no'
+```
+
+## String Formatting
+
+This string formatter is similar to the `String.Format` method in .NET. 
+It replaces placeholders in a string with values.
+
+```typescript
+import { stringFormatter } from '@code-art-eg/globalite';
+
+const formatter = stringFormatter('en-US');
+
+const res = formatString(
+	'en',
+	'Hello {name}! I am {age} years old. Today is {date:D}. Boolean value is {b}.',
+	{
+		name: 'world',
+		age: 19,
+		date: new Date(),
+		b: true,
+	}
+);
+
+console.log(res); // Hello world! I am 19 years old. Today is Thursday, January 9, 2025. Boolean value is yes.
+
+const res1 = formatString(
+	'en',
+	'Hello {0}! I am {1} years old. Today is {2:D}. Boolean value is {3}.',
+	'world',
+	19,
+	new Date(),
+	false
+);
+
+console.log(res1); // Hello world! I am 19 years old. Today is Thursday, January 9, 2025. Boolean value is no.
+
+```
+
 ## Known Issues
 
 - The library doesn't support parsing dates in different calendar systems. It only supports the Gregorian calendar.

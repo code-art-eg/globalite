@@ -9,3 +9,4 @@ export { numberParser } from './number-parser';
 export { dateFormatter } from './date-formatter';
 export { dateParser } from './date-parser';
 export { booleanFormatter } from './boolean-formatter';
+export { formatString } from './string-formatter';

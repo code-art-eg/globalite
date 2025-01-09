@@ -3,7 +3,7 @@
 import assert from 'node:assert/strict';
 import { describe, it } from 'node:test';
 
-import { booleanFormatter } from '../src';
+import { booleanFormatter } from '@code-art-eg/globalite';
 
 describe('booleanFormatter', () => {
 	const testCases = [
