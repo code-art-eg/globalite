@@ -26,27 +26,10 @@ yarn add @code-art-eg/globalite
 
 ## Usage
 
-### Number Formatting
+See documentation in [docs](https://code-art-eg.github.io/globalite/) for more details.
 
-```typescript
-import { numberFormatter } from '@code-art-eg/globalite';
 
-const formatter = numberFormatter('en-US', 'cUSD'); // US locale, currency in US dollars
-
-const formattedNumber = formatter(1234.56); // returns '$1,234.56'
-```
-
-### Number Parsing
-
-```typescript
-import { numberParser } from '@code-art-eg/globalite';
-
-const parser = numberParser('de-DE', 'cEUR'); // German locale, currency in Euros
-
-const number = parser('1.234,56€'); // returns 1234.56
-```
-
-#### Note about number parsing
+### Note about number parsing
 
 The number parser returns `null` if the input string is not a valid number instead of `NaN` returned by `parseInt`
 , `parseFloat` and Globalize parser. This is because `NaN` can lead to bugs in your code if you don't check for it.
@@ -78,73 +61,6 @@ const number = parseInt('abc'); // returns null
 if (number !== null) {
 	doSomethingWithNumber(number);
 }
-```
-
-### Date Formatting
-
-```typescript
-import { dateFormatter } from '@code-art-eg/globalite';
-
-const formatter = dateFormatter('en-US', 'd'); // US locale, short date format
-
-const formattedDate = formatter(new Date()); // returns '12/31/2021'
-```
-
-### Date Parsing
-
-```typescript
-import { dateParser } from '@code-art-eg/globalite';
-
-const parser = dateParser('en-US', 'd'); // US locale, short date format
-
-const date = parser('12/31/2021'); // returns a Date object
-```
-
-## Boolean Formatting
-
-```typescript
-import { booleanFormatter } from '@code-art-eg/globalite';
-
-const formatter = booleanFormatter('en-US');
-
-const formattedTrue = formatter(true); // returns 'yes'
-const formattedFalse = formatter(false); // returns 'no'
-```
-
-## String Formatting
-
-This string formatter is similar to the `String.Format` method in .NET. 
-It replaces placeholders in a string with values.
-
-```typescript
-import { stringFormatter } from '@code-art-eg/globalite';
-
-const formatter = stringFormatter('en-US');
-
-const res = formatString(
-	'en',
-	'Hello {name}! I am {age} years old. Today is {date:D}. Boolean value is {b}.',
-	{
-		name: 'world',
-		age: 19,
-		date: new Date(),
-		b: true,
-	}
-);
-
-console.log(res); // Hello world! I am 19 years old. Today is Thursday, January 9, 2025. Boolean value is yes.
-
-const res1 = formatString(
-	'en',
-	'Hello {0}! I am {1} years old. Today is {2:D}. Boolean value is {3}.',
-	'world',
-	19,
-	new Date(),
-	false
-);
-
-console.log(res1); // Hello world! I am 19 years old. Today is Thursday, January 9, 2025. Boolean value is no.
-
 ```
 
 ## Known Issues
