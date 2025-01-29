@@ -34,7 +34,7 @@ See documentation in [docs](https://code-art-eg.github.io/globalite/) for more d
 The number parser returns `null` if the input string is not a valid number instead of `NaN` returned by `parseInt`
 , `parseFloat` and Globalize parser. This is because `NaN` can lead to bugs in your code if you don't check for it.
 I have fallen into this trap many times and encountered bugs in my projects because I didn't check for `NaN` before 
-using the parsed number.So I think it's better to return `null` instead of `NaN`.
+using the parsed number. So I think it's better to return `null` instead of `NaN`.
 For example:
 
 ```typescript
@@ -56,7 +56,7 @@ To fix this, you can check if the number is `null` before calling `doSomethingWi
 
 ```typescript
 
-const number = parseInt('abc'); // returns null
+const number = parse('abc'); // returns null
 
 if (number !== null) {
 	doSomethingWithNumber(number);
