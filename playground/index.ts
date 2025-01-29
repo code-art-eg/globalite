@@ -1,7 +1,5 @@
-import { getCountries } from '../src/country-name';
+import { getMonthName } from '../src/get-month-name';
 
-getCountries('ar').forEach(country => {
-	console.log(country);
-});
-
-console.log(getCountries('de').length);
+for (let i = 0; i < 12; i++) {
+	console.log(getMonthName('ar-SA', i, 'long', 'islamic'));
+}
