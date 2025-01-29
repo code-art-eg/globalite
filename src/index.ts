@@ -15,5 +15,6 @@ export { languageName } from './language-name';
 
 export { getMonthName } from './get-month-name';
 export { getDayName } from './get-day-name';
+export { durationFormatter } from './duration-formatter';
 
 export type { Country } from './country-name';

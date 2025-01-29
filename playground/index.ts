@@ -1,5 +1,5 @@
-import { getMonthName } from '../src/get-month-name';
+import { durationFormatter } from '@code-art-eg/globalite';
 
-for (let i = 0; i < 12; i++) {
-	console.log(getMonthName('ar-SA', i, 'long', 'islamic'));
-}
+const fmt = durationFormatter('en', 'constant');
+
+console.log(fmt(787812300));
