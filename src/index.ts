@@ -10,11 +10,15 @@ export { dateFormatter } from './date-formatter';
 export { dateParser } from './date-parser';
 export { booleanFormatter } from './boolean-formatter';
 export { formatString } from './string-formatter';
-export { countryName, COUNTRY_CODES, getCountries } from './country-name';
-export { languageName } from './language-name';
+export {
+	getCountryName,
+	COUNTRY_CODES,
+	getCountries,
+} from './get-country-name';
+export { getLanguageName } from './get-language-name';
 
 export { getMonthName } from './get-month-name';
 export { getDayName } from './get-day-name';
 export { durationFormatter } from './duration-formatter';
 
-export type { Country } from './country-name';
+export type { Country } from './get-country-name';

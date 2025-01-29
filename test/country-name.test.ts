@@ -1,6 +1,6 @@
 import { describe, it } from 'node:test';
 
-import { countryName } from '@code-art-eg/globalite';
+import { getCountryName } from '@code-art-eg/globalite';
 import assert from 'node:assert/strict';
 
 describe('countryName', () => {
@@ -15,7 +15,7 @@ describe('countryName', () => {
 
 	testCases.forEach(({ locale, countryCode, expected }) => {
 		it(`should return the correct country name for locale ${locale} and country code ${countryCode}`, () => {
-			assert.strictEqual(countryName(locale, countryCode), expected);
+			assert.strictEqual(getCountryName(locale, countryCode), expected);
 		});
 	});
 });

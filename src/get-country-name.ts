@@ -6,10 +6,10 @@
  * @returns {string} The localized country name or the country code if the name is not found.
  *
  * @example
- * console.log(countryName('en', 'US')); // 'United States'
- * console.log(countryName('fr', 'US')); // 'États-Unis'
+ * console.log(getCountryName('en', 'US')); // 'United States'
+ * console.log(getCountryName('fr', 'US')); // 'États-Unis'
  */
-export function countryName(locale: string, countryCode: string): string {
+export function getCountryName(locale: string, countryCode: string): string {
 	const displayNames = new Intl.DisplayNames([locale], { type: 'region' });
 	return displayNames.of(countryCode) || countryCode;
 }

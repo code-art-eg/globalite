@@ -1,4 +1,4 @@
-import { languageName } from '../src/language-name';
+import { getLanguageName } from '@code-art-eg/globalite';
 import assert from 'node:assert/strict';
 import { describe, it } from 'node:test';
 
@@ -14,7 +14,7 @@ describe('languageName', () => {
 
 	testCases.forEach(({ locale, languageCode, expected }) => {
 		it(`should return the correct language name for locale ${locale} and language code ${languageCode}`, () => {
-			const result = languageName(locale, languageCode);
+			const result = getLanguageName(locale, languageCode);
 			assert.strictEqual(result, expected);
 		});
 	});

@@ -6,10 +6,10 @@
  * @returns {string} The localized language name or the language code if the name is not found.
  *
  * @example
- * console.log(languageName('en', 'fr')); // 'French'
- * console.log(languageName('es', 'en')); // 'inglés'
+ * console.log(getLanguageName('en', 'fr')); // 'French'
+ * console.log(getLanguageName('es', 'en')); // 'inglés'
  */
-export function languageName(locale: string, languageCode: string): string {
+export function getLanguageName(locale: string, languageCode: string): string {
 	const displayNames = new Intl.DisplayNames([locale], { type: 'language' });
 	return displayNames.of(languageCode) || languageCode;
 }
