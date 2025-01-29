@@ -6,6 +6,38 @@ import {
 	getTimeSeparator,
 } from './format-util';
 
+/**
+ * Returns a duration formatter function for the specified locale and format.
+ * The formatter function converts duration values to localized strings.
+ *
+ * @param {string} locale - The locale to use for formatting.
+ * @param {string} [format] - The format pattern to use for formatting.
+ * @returns {NumberFormatter} The duration formatter function.
+ *
+ * @remarks
+ * The duration passed to the formatter is in milliseconds.
+ * pattern: [-][d.]hh:mm:ss[.fff]
+ * if format is constant, pattern: [-]d:hh:mm:ss.fff
+ * if format is short, pattern: [-][d:]h:mm[:ss[.FFF]]
+ * if format is long, pattern: [-][d:]hh:mm:ss[.fff]
+ * if format is racing, pattern: [-][d:][h:]mm:ss.fff
+ *
+ *
+ * Elements in square brackets ([ and ]) are not included if they don't have values.
+ * Colons and periods are replaced with the appropriate time separator and decimal separator for the locale.
+ * Numbers are formatted using the numberFormatter function.
+ * The minus sign is replaced with the appropriate minus sign for the locale.
+ * The plus sign is replaced with the appropriate plus sign for the locale.
+ *
+ * d: days in the time duration.
+ * h: hours in the time duration.
+ * m: minutes in the time duration.
+ * s: seconds in the time duration.
+ * f: fraction of second in the time duration (fixed).
+ * F: fraction of second in the time duration (variable trailing zeros are omitted).
+ * 'text': a quoted string is included as is.
+ * \: is used to escape a characters to be included as is.
+ */
 export function durationFormatter(
 	locale: string,
 	format?: string

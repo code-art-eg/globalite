@@ -2,6 +2,20 @@ import { numberFormatter } from './number-formatter';
 import { booleanFormatter } from './boolean-formatter';
 import { dateFormatter } from './date-formatter';
 
+/**
+ * Formats a string using the specified locale and format string, replacing placeholders with the provided arguments.
+ *
+ * @param {string} locale - The locale to use for formatting.
+ * @param {string} format - The format string containing placeholders.
+ * @param {...unknown} args - The arguments to replace the placeholders.
+ * @returns {string} The formatted string.
+ *
+ * @remarks
+ * The function behaves like .NET string.Format method
+ * @example
+ * console.log(formatString('en', 'Hello, {0}!', 'world')); // 'Hello, world!'
+ * console.log(formatString('en', 'The date is {0:d}', new Date())); // 'The date is 10/31/2021'
+ */
 export function formatString(
 	locale: string,
 	format: string,

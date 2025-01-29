@@ -1,13 +1,30 @@
+/**
+ * Returns the localized name of a country given its locale and country code.
+ *
+ * @param {string} locale - The locale to use for formatting the country name.
+ * @param {string} countryCode - The ISO 3166-1 alpha-2 country code.
+ * @returns {string} The localized country name or the country code if the name is not found.
+ *
+ * @example
+ * console.log(countryName('en', 'US')); // 'United States'
+ * console.log(countryName('fr', 'US')); // 'États-Unis'
+ */
 export function countryName(locale: string, countryCode: string): string {
 	const displayNames = new Intl.DisplayNames([locale], { type: 'region' });
 	return displayNames.of(countryCode) || countryCode;
 }
 
+/**
+ * A country object with a country code and name.
+ */
 export type Country = {
 	code: string;
 	name: string;
 };
 
+/**
+ * An array of ISO 3166-1 alpha-2 country codes.
+ */
 export const COUNTRY_CODES = [
 	'AD',
 	'AE',
@@ -260,6 +277,21 @@ export const COUNTRY_CODES = [
 	'ZW',
 ];
 
+/**
+ * Returns an array of country objects with country codes and names.
+ *
+ * @param {string} locale - The locale to use for formatting the country names.
+ * @returns {Country[]} An array of country objects.
+ *
+ * @example
+ * console.log(getCountries('en'));
+ * // [
+ * //   { code: 'AD', name: 'Andorra' },
+ * //   { code: 'AE', name: 'United Arab Emirates' },
+ * //   { code: 'AF', name: 'Afghanistan' },
+ * //   ...
+ * // ]
+ */
 export function getCountries(locale: string): Country[] {
 	const displayNames = new Intl.DisplayNames(locale, { type: 'region' });
 	const collator = new Intl.Collator(locale);

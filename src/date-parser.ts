@@ -2,19 +2,77 @@ import { getOptionsFromSpecifier, parseDateSpecifier } from './dates';
 import { numberParser, NumberParser } from './number-parser';
 import { compareStringsAtIndex } from './parse-util';
 
+/**
+ * A function that parses a date string and returns a Date object or null if parsing fails.
+ *
+ * @typedef {function(string): (Date | null)} DateParser
+ */
 export type DateParser = (date: string) => Date | null;
 
+/**
+ * Creates a date parser function based on the specified locale.
+ *
+ * @param {string} locale - The locale to use for parsing.
+ * @returns {DateParser} A function that parses a date string according to the specified locale.
+ */
 export function dateParser(locale: string): DateParser;
+
+/**
+ * Creates a date parser function based on the specified locale and specifier.
+ *
+ * @param {string} locale - The locale to use for parsing.
+ * @param {string} specifier - The parsing specifier string.
+ * @param {string} [timeZone] - The time zone to use for parsing.
+ * @returns {DateParser} A function that parses a date string according to the specified locale and specifier.
+ *
+ * @remarks
+ * The following are specifiers and values for 2008-07-31 15:30:45.678 using the de-DE locale
+ * and Europe/Berlin time zone (DST GMT+2):
+ * specifier: 'd' => '31.07.2008'
+ * specifier: 'D' => 'Donnerstag, 31. Juli 2008'
+ * specifier: 'f' => 'Donnerstag, 31. Juli 2008 um 15:30'
+ * specifier: 'F' => 'Donnerstag, 31. Juli 2008 um 15:30:45'
+ * specifier: 'g' => '31.07.2008 15:30'
+ * specifier: 'G' => '31.07.2008 15:30:45'
+ * specifier: 'm' => '31. Juli'
+ * specifier: 'M' => '31. Juli'
+ * specifier: 'o' => '2008-07-31T13:30:45.6780000'
+ * specifier: 'O' => '2008-07-31T13:30:45.6780000'
+ * specifier: 'r' => 'Thu, 31 Jul 2008 13:30:45 GMT'
+ * specifier: 'R' => 'Thu, 31 Jul 2008 13:30:45 GMT'
+ * specifier: 's' => '2008-07-31T13:30:45'
+ * specifier: 'S' => '2008-07-31T13:30:45'
+ * specifier: 't' => '15:30'
+ * specifier: 'T' => '15:30:45'
+ * specifier: 'u' => '2008-07-31 13:30:45Z'
+ * specifier: 'U' => 'Donnerstag, 31. Juli 2008 13:30:45'
+ * specifier: 'Y' => Oktober 2008
+ */
 export function dateParser(
 	locale: string,
 	specifier: string,
 	timeZone?: string
 ): DateParser;
+/**
+ * Creates a date parser function based on the specified locale and options.
+ *
+ * @param {string} locale - The locale to use for parsing.
+ * @param {Intl.NumberFormatOptions} options - The parsing options.
+ * @returns {DateParser} A function that parses a date string according to the specified locale and options.
+ */
 export function dateParser(
 	locale: string,
 	options: Intl.NumberFormatOptions
 ): DateParser;
 
+/**
+ * Creates a date parser function based on the specified locale, options, or specifier.
+ *
+ * @param {string} locale - The locale to use for parsing.
+ * @param {string | Intl.NumberFormatOptions} [options] - The parsing options or specifier.
+ * @param {string} [timeZone] - The time zone to use for parsing.
+ * @returns {DateParser} A function that parses a date string according to the specified locale and options or specifier.
+ */
 export function dateParser(
 	locale: string,
 	options?: string | Intl.NumberFormatOptions,

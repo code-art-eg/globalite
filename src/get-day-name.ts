@@ -1,3 +1,15 @@
+/**
+ * Returns the localized name of a day of the week for a given locale and format.
+ *
+ * @param {string} locale - The locale to use for formatting the day name.
+ * @param {number} day - The day of the week (0 for Sunday, 1 for Monday, etc.).
+ * @param {'short' | 'narrow' | 'long'} [format='long'] - The format to use for the day name.
+ * @returns {string} The localized name of the day.
+ *
+ * @example
+ * console.log(getDayName('en', 0)); // 'Sunday'
+ * console.log(getDayName('fr', 1, 'short')); // 'lun.'
+ */
 export function getDayName(
 	locale: string,
 	day: number,

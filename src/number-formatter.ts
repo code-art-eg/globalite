@@ -1,5 +1,10 @@
 import { getOptionsFromSpecifier, parseNumberSpecifier } from './numbers';
 
+/**
+ * A function that formats a number and returns a string.
+ *
+ * @typedef {function(number): string} NumberFormatter
+ */
 export type NumberFormatter = (value: number) => string;
 
 /**
@@ -35,6 +40,13 @@ export function numberFormatter(
 	options: Intl.NumberFormatOptions
 ): NumberFormatter;
 
+/**
+ * Creates a number formatter function based on the specified locale, options, or specifier.
+ *
+ * @param {string} locale - The locale to use for formatting.
+ * @param {string | Intl.NumberFormatOptions} [options] - The formatting options or specifier.
+ * @returns {NumberFormatter} A function that formats a number according to the specified locale and options or specifier.
+ */
 export function numberFormatter(
 	locale: string,
 	options?: Intl.NumberFormatOptions | string

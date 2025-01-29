@@ -1,3 +1,16 @@
+/**
+ * Returns the localized name of a month for a given locale, format, and calendar.
+ *
+ * @param {string} locale - The locale to use for formatting the month name.
+ * @param {number} month - The month (0 for January, 1 for February, etc.).
+ * @param {'short' | 'narrow' | 'long'} [format='long'] - The format to use for the month name.
+ * @param {'gregory' | 'islamic'} [calendar='gregory'] - The calendar to use for formatting the month name.
+ * @returns {string} The localized name of the month.
+ *
+ * @example
+ * console.log(getMonthName('en', 0)); // 'January'
+ * console.log(getMonthName('ar', 0, 'long', 'islamic')); // 'محرم'
+ */
 export function getMonthName(
 	locale: string,
 	month: number,

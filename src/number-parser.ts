@@ -1,6 +1,11 @@
 import { getEndsWithRe, getStartsWithRe, looseMatch } from './parse-util';
 import { getOptionsFromSpecifier, parseNumberSpecifier } from './numbers';
 
+/**
+ * A function that parses a string and returns a number or null.
+ *
+ * @typedef {function(string): (number | null)} NumberParser
+ */
 export type NumberParser = (value: string) => number | null;
 
 /**
@@ -56,17 +61,26 @@ export function numberParser(
 	optionsOrSpecifier?: Intl.NumberFormatOptions | string
 ): NumberParser;
 
+/**
+ * Creates a number parsing function based on the specified locale and options or specifier.
+ *
+ * @param {string} locale - The locale to use for parsing.
+ * @param {Intl.NumberFormatOptions | string} [optionsOrSpecifier] - The parsing options or specifier string.
+ * @returns {NumberParser} A function that parses a number according to the specified locale and options or specifier.
+ * @throws {Error} If the currency code in the specifier is invalid.
+ * @throws {Error} If the number format specifier is invalid.
+ */
 export function numberParser(
 	locale: string,
-	options?: Intl.NumberFormatOptions | string
+	optionsOrSpecifier?: Intl.NumberFormatOptions | string
 ): NumberParser {
-	if (!options) {
-		options = 'n';
+	if (!optionsOrSpecifier) {
+		optionsOrSpecifier = 'n';
 	}
-	if (typeof options === 'string') {
-		return getParserFromSpecifiers(locale, options);
+	if (typeof optionsOrSpecifier === 'string') {
+		return getParserFromSpecifiers(locale, optionsOrSpecifier);
 	}
-	return getNumberParserFromOptions(locale, options);
+	return getNumberParserFromOptions(locale, optionsOrSpecifier);
 }
 
 function getNumberParserFromOptions(
