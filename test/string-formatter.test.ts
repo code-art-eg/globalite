@@ -22,6 +22,12 @@ describe('formatString', () => {
 				'Hello world! I am 19 years old. Today is Tuesday, October 10, 2023. Boolean value is yes.',
 		},
 		{
+			locale: 'en-US',
+			format: 'Hello, {0} {1}!',
+			args: ['John', 'Doe'],
+			expected: 'Hello, John Doe!',
+		},
+		{
 			locale: 'de',
 			format: 'Hallo {name}! Ich bin {age:d} Jahre alt. Heute ist {date:D}. Boolean-Wert ist {b}.',
 			args: [
