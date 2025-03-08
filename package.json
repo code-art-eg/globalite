@@ -1,6 +1,6 @@
 {
 	"name": "@code-art-eg/globalite",
-	"version": "0.6.0",
+	"version": "0.0.0",
 	"description": "A globalization library inspired by Globalize library but using Intl API",
 	"repository": {
 		"type": "git",
@@ -38,5 +38,6 @@
 		"typescript-eslint": "^8.26.0"
 	},
 	"private": false,
-	"type": "module"
+	"type": "module",
+	"keywords": ["globalization", "globalite", "globalize", "intl", "i18n", "l10n", "parsing", "formatting", "dates", "numbers"]
 }
