@@ -37,6 +37,9 @@ jobs:
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPMJS_PUBLISH_TOKEN }}
 
+      - name: Configure npm for GitHub Packages
+        run: echo "//npm.pkg.github.com/:_authToken=${{ secrets.NPM_GITHUB_PUBLISH_TOKEN }}" >> ~/.npmrc
+
       - name: Publish to github npm registry
         run: yarn publish --provenance --access public --registry https://npm.pkg.github.com/ --non-interactive
         working-directory: ./build
