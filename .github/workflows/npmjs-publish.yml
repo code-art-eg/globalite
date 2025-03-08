@@ -29,8 +29,14 @@ jobs:
       - name: Build project
         run: yarn build
 
-      - name: Publish to npm
-        run: yarn publish --provenance --access public
+      - name: Publish to npmjs registry
+        run: yarn publish --provenance --access public --non-interactive
         working-directory: ./build
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPMJS_PUBLISH_TOKEN }}
+
+      - name: Publish to github npm registry
+        run: yarn publish --provenance --access public --registry https://npm.pkg.github.com/ --non-interactive
+        working-directory: ./build
+        env:
+            NODE_AUTH_TOKEN: ${{ secrets.NPM_GITHUB_PUBLISH_TOKEN }}
