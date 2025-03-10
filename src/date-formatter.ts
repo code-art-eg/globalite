@@ -1,7 +1,7 @@
 import { getOptionsFromSpecifier, parseDateSpecifier } from './dates';
 import { numberFormatter } from './number-formatter';
 import { numberParser } from './number-parser';
-import { asDate, DateOnly } from './date-only';
+import { dateOnlyToDate, DateOnly } from './date-only';
 
 export type DateFormatter = (date: Date | DateOnly) => string;
 
@@ -77,7 +77,7 @@ export function dateFormatter(
 
 	const intl = new Intl.DateTimeFormat(locale, optionsOrSpecifier);
 	const formatter = intl.format.bind(intl);
-	return (date: Date | DateOnly) => formatter(asDate(date, timeZone));
+	return (date: Date | DateOnly) => formatter(dateOnlyToDate(date, timeZone));
 }
 
 const formatterCache = new Map<string, DateFormatter>();
@@ -108,7 +108,7 @@ function getFormatterFromSpecifier(
 			const nFmt = numberFormatter(locale, 'd4');
 			const nPrs = numberParser(locale, 'd4');
 			formatter = (date: Date | DateOnly) => {
-				date = asDate(date, timeZone);
+				date = dateOnlyToDate(date, timeZone);
 				const formatted = captured(date);
 				return formatted.reduce((ac, cv) => {
 					// We always need the year to be 4 digits
@@ -142,23 +142,24 @@ function getLocaleIndependentFormatter(
 	timeZone: string | undefined
 ): DateFormatter {
 	if (specifier === 'r' || specifier === 'R') {
-		return (date: Date | DateOnly) => asDate(date, timeZone).toUTCString();
+		return (date: Date | DateOnly) =>
+			dateOnlyToDate(date, timeZone).toUTCString();
 	}
 	if (specifier === 'u') {
 		return (date: Date | DateOnly) => {
-			const isoString = asDate(date, timeZone).toISOString();
+			const isoString = dateOnlyToDate(date, timeZone).toISOString();
 			return isoString.slice(0, 10) + ' ' + isoString.slice(11, 19) + 'Z';
 		};
 	}
 	if (specifier === 's' || specifier === 'S') {
 		return (date: Date | DateOnly) => {
-			const isoString = asDate(date, timeZone).toISOString();
+			const isoString = dateOnlyToDate(date, timeZone).toISOString();
 			return isoString.slice(0, 19);
 		};
 	}
 	if (specifier === 'o' || specifier === 'O') {
 		return (date: Date | DateOnly) => {
-			const isoString = asDate(date, timeZone).toISOString();
+			const isoString = dateOnlyToDate(date, timeZone).toISOString();
 			return isoString.slice(0, 23) + '0000';
 		};
 	}

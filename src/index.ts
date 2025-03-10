@@ -24,4 +24,19 @@ export { durationFormatter } from './duration-formatter';
 export type { Country } from './get-country-name';
 
 export type { DateOnly } from './date-only';
-export { isDateOnly } from './date-only';
+export {
+	isDateOnly,
+	today,
+	tomorrow,
+	compareDateOnly,
+	yesterday,
+	startOfMonth,
+	startOfYear,
+	endOfYear,
+	endOfMonth,
+	addYears,
+	addDays,
+	addMonths,
+	dateOnlyToDate,
+	dateToDateOnly,
+} from './date-only';
