@@ -1,9 +1,10 @@
 import assert from 'node:assert/strict';
 import { describe, it } from 'node:test';
 
-import { dateFormatter } from '@code-art-eg/globalite';
+import { dateFormatter, DateOnly } from '@code-art-eg/globalite';
 
 const testDate = new Date('2008-02-27T13:30:45.678Z');
+const testDateOnly = { year: 2008, month: 2, day: 27 };
 const testTimeZone = 'Europe/Berlin';
 
 describe('Date Formatter without specifier', () => {
@@ -12,6 +13,14 @@ describe('Date Formatter without specifier', () => {
 		assert.strictEqual(
 			formatter(testDate),
 			'Wednesday, February 27, 2008 at 2:30 PM'
+		);
+	});
+
+	it('Correctly formats date only using en-US locale', () => {
+		const formatter = dateFormatter('en-US', '');
+		assert.strictEqual(
+			formatter(testDateOnly),
+			'Wednesday, February 27, 2008 at 12:00 AM'
 		);
 	});
 
@@ -32,10 +41,109 @@ describe('Date Formatter without specifier', () => {
 	});
 });
 
+type edgeCaseTest = {
+	timeZone: string;
+	winterStart: DateOnly;
+	summerStart: DateOnly;
+};
+
+describe('DateOnly timezone Edge Cases', () => {
+	const tests: edgeCaseTest[] = [
+		{
+			timeZone: 'America/Los_Angeles', // Western Hemisphere
+			winterStart: { year: 2024, month: 11, day: 3 },
+			summerStart: { year: 2024, month: 3, day: 10 },
+		},
+		{
+			timeZone: 'Europe/London', // At Meridian
+			winterStart: { year: 2024, month: 10, day: 27 },
+			summerStart: { year: 2024, month: 3, day: 31 },
+		},
+		{
+			timeZone: 'Europe/Berlin', // Near Meridian
+			winterStart: { year: 2024, month: 10, day: 27 },
+			summerStart: { year: 2024, month: 3, day: 31 },
+		},
+		{
+			timeZone: 'Australia/Sydney', // Eastern Hemisphere
+			winterStart: { year: 2025, month: 4, day: 6 },
+			summerStart: { year: 2024, month: 10, day: 6 },
+		},
+	];
+
+	function addDays(date: DateOnly, days: number): DateOnly {
+		const d = new Date(
+			Date.UTC(date.year, date.month - 1, date.day, 0, 0, 0, 0)
+		);
+		d.setUTCDate(d.getUTCDate() + days);
+		return {
+			year: d.getUTCFullYear(),
+			month: d.getUTCMonth() + 1,
+			day: d.getUTCDate(),
+		};
+	}
+
+	for (const test of tests) {
+		it(`Correctly formats date using at start of winter in ${test.timeZone} timezone`, () => {
+			const formatter = dateFormatter('en-US', 'd', test.timeZone);
+			assert.strictEqual(
+				formatter(test.winterStart),
+				`${test.winterStart.month}/${test.winterStart.day}/${test.winterStart.year}`
+			);
+		});
+		it(`Correctly formats date using before start of winter in ${test.timeZone} timezone`, () => {
+			const formatter = dateFormatter('en-US', 'd', test.timeZone);
+			const date = addDays(test.winterStart, -1);
+			assert.strictEqual(
+				formatter(date),
+				`${date.month}/${date.day}/${date.year}`
+			);
+		});
+		it(`Correctly formats date using after start of winter in ${test.timeZone} timezone`, () => {
+			const formatter = dateFormatter('en-US', 'd', test.timeZone);
+			const date = addDays(test.winterStart, +1);
+			assert.strictEqual(
+				formatter(date),
+				`${date.month}/${date.day}/${date.year}`
+			);
+		});
+
+		it(`Correctly formats date using at start of summer in ${test.timeZone} timezone`, () => {
+			const formatter = dateFormatter('en-US', 'd', test.timeZone);
+			assert.strictEqual(
+				formatter(test.summerStart),
+				`${test.summerStart.month}/${test.summerStart.day}/${test.summerStart.year}`
+			);
+		});
+
+		it(`Correctly formats date using before start of summer in ${test.timeZone} timezone`, () => {
+			const formatter = dateFormatter('en-US', 'd', test.timeZone);
+			const date = addDays(test.summerStart, -1);
+			assert.strictEqual(
+				formatter(date),
+				`${date.month}/${date.day}/${date.year}`
+			);
+		});
+		it(`Correctly formats date using after start of summer in ${test.timeZone} timezone`, () => {
+			const formatter = dateFormatter('en-US', 'd', test.timeZone);
+			const date = addDays(test.summerStart, +1);
+			assert.strictEqual(
+				formatter(date),
+				`${date.month}/${date.day}/${date.year}`
+			);
+		});
+	}
+});
+
 describe('Date Formatter with d specifier', () => {
 	it('Correctly formats date using en-US locale', () => {
 		const formatter = dateFormatter('en-US', 'd', testTimeZone);
 		assert.strictEqual(formatter(testDate), '2/27/2008');
+	});
+
+	it('Correctly formats date only using en-US locale', () => {
+		const formatter = dateFormatter('en-US', 'd', testTimeZone);
+		assert.strictEqual(formatter(testDateOnly), '2/27/2008');
 	});
 
 	it('Correctly formats date using de-DE locale', () => {
@@ -53,6 +161,14 @@ describe('Date Formatter with D specifier', () => {
 	it('Correctly formats date using en-US locale', () => {
 		const formatter = dateFormatter('en-US', 'D', testTimeZone);
 		assert.strictEqual(formatter(testDate), 'Wednesday, February 27, 2008');
+	});
+
+	it('Correctly formats date only using en-US locale', () => {
+		const formatter = dateFormatter('en-US', 'D', testTimeZone);
+		assert.strictEqual(
+			formatter(testDateOnly),
+			'Wednesday, February 27, 2008'
+		);
 	});
 
 	it('Correctly formats date using de-DE locale', () => {
@@ -75,6 +191,14 @@ describe('Date Formatter with f specifier', () => {
 		);
 	});
 
+	it('Correctly formats date only with time using en-US locale', () => {
+		const formatter = dateFormatter('en-US', 'f', testTimeZone);
+		assert.strictEqual(
+			formatter(testDateOnly),
+			'Wednesday, February 27, 2008 at 12:00 AM'
+		);
+	});
+
 	it('Correctly formats date and time using de-DE locale', () => {
 		const formatter = dateFormatter('de-DE', 'f', testTimeZone);
 		assert.strictEqual(
@@ -93,6 +217,14 @@ describe('Date Formatter with f specifier', () => {
 });
 
 describe('Date Formatter with F specifier', () => {
+	it('Correctly formats date only with time with seconds using en-US locale', () => {
+		const formatter = dateFormatter('en-US', 'F', testTimeZone);
+		assert.strictEqual(
+			formatter(testDateOnly),
+			'Wednesday, February 27, 2008 at 12:00:00 AM'
+		);
+	});
+
 	it('Correctly formats date and time with seconds using en-US locale', () => {
 		const formatter = dateFormatter('en-US', 'F', testTimeZone);
 		assert.strictEqual(
@@ -119,6 +251,11 @@ describe('Date Formatter with F specifier', () => {
 });
 
 describe('Date Formatter with g specifier', () => {
+	it('Correctly formats date only with time using en-US locale', () => {
+		const formatter = dateFormatter('en-US', 'g', testTimeZone);
+		assert.strictEqual(formatter(testDateOnly), '2/27/2008, 12:00 AM');
+	});
+
 	it('Correctly formats date and time using en-US locale', () => {
 		const formatter = dateFormatter('en-US', 'g', testTimeZone);
 		assert.strictEqual(formatter(testDate), '2/27/2008, 2:30 PM');
@@ -136,6 +273,11 @@ describe('Date Formatter with g specifier', () => {
 });
 
 describe('Date Formatter with G specifier', () => {
+	it('Correctly formats date only with time with seconds using en-US locale', () => {
+		const formatter = dateFormatter('en-US', 'G', testTimeZone);
+		assert.strictEqual(formatter(testDateOnly), '2/27/2008, 12:00:00 AM');
+	});
+
 	it('Correctly formats date and time with seconds using en-US locale', () => {
 		const formatter = dateFormatter('en-US', 'G', testTimeZone);
 		assert.strictEqual(formatter(testDate), '2/27/2008, 2:30:45 PM');
@@ -153,6 +295,11 @@ describe('Date Formatter with G specifier', () => {
 });
 
 describe('Date Formatter with m specifier', () => {
+	it('Correctly formats date only using en-US locale', () => {
+		const formatter = dateFormatter('en-US', 'm', testTimeZone);
+		assert.strictEqual(formatter(testDateOnly), 'February 27');
+	});
+
 	it('Correctly formats date using en-US locale', () => {
 		const formatter = dateFormatter('en-US', 'm', testTimeZone);
 		assert.strictEqual(formatter(testDate), 'February 27');
@@ -170,6 +317,14 @@ describe('Date Formatter with m specifier', () => {
 });
 
 describe('Date Formatter with o specifier', () => {
+	it('Correctly formats date only with time using en-US locale', () => {
+		const formatter = dateFormatter('en-US', 'o', testTimeZone);
+		assert.strictEqual(
+			formatter(testDateOnly),
+			'2008-02-26T23:00:00.0000000'
+		);
+	});
+
 	it('Correctly formats date and time using en-US locale', () => {
 		const formatter = dateFormatter('en-US', 'o', testTimeZone);
 		assert.strictEqual(formatter(testDate), '2008-02-27T13:30:45.6780000');
@@ -187,6 +342,14 @@ describe('Date Formatter with o specifier', () => {
 });
 
 describe('Date Formatter with r specifier', () => {
+	it('Correctly formats date only with time using en-US locale', () => {
+		const formatter = dateFormatter('en-US', 'r', testTimeZone);
+		assert.strictEqual(
+			formatter(testDateOnly),
+			'Tue, 26 Feb 2008 23:00:00 GMT'
+		);
+	});
+
 	it('Correctly formats date and time using en-US locale', () => {
 		const formatter = dateFormatter('en-US', 'r', testTimeZone);
 		assert.strictEqual(
@@ -213,6 +376,11 @@ describe('Date Formatter with r specifier', () => {
 });
 
 describe('Date Formatter with s specifier', () => {
+	it('Correctly formats date only with time using en-US locale', () => {
+		const formatter = dateFormatter('en-US', 's', testTimeZone);
+		assert.strictEqual(formatter(testDateOnly), '2008-02-26T23:00:00');
+	});
+
 	it('Correctly formats date and time using en-US locale', () => {
 		const formatter = dateFormatter('en-US', 's', testTimeZone);
 		assert.strictEqual(formatter(testDate), '2008-02-27T13:30:45');
@@ -230,6 +398,11 @@ describe('Date Formatter with s specifier', () => {
 });
 
 describe('Date Formatter with t specifier', () => {
+	it('Correctly formats time for DateOnly using en-US locale', () => {
+		const formatter = dateFormatter('en-US', 't', testTimeZone);
+		assert.strictEqual(formatter(testDateOnly), '12:00 AM');
+	});
+
 	it('Correctly formats time using en-US locale', () => {
 		const formatter = dateFormatter('en-US', 't', testTimeZone);
 		assert.strictEqual(formatter(testDate), '2:30 PM');
@@ -247,6 +420,11 @@ describe('Date Formatter with t specifier', () => {
 });
 
 describe('Date Formatter with T specifier', () => {
+	it('Correctly formats date only time with seconds using en-US locale', () => {
+		const formatter = dateFormatter('en-US', 'T', testTimeZone);
+		assert.strictEqual(formatter(testDateOnly), '12:00:00 AM');
+	});
+
 	it('Correctly formats time with seconds using en-US locale', () => {
 		const formatter = dateFormatter('en-US', 'T', testTimeZone);
 		assert.strictEqual(formatter(testDate), '2:30:45 PM');
@@ -264,6 +442,11 @@ describe('Date Formatter with T specifier', () => {
 });
 
 describe('Date Formatter with Y specifier', () => {
+	it('Correctly formats DateOnly year and month using en-US locale', () => {
+		const formatter = dateFormatter('en-US', 'Y', testTimeZone);
+		assert.strictEqual(formatter(testDateOnly), 'February 2008');
+	});
+
 	it('Correctly formats year and month using en-US locale', () => {
 		const formatter = dateFormatter('en-US', 'Y', testTimeZone);
 		assert.strictEqual(formatter(testDate), 'February 2008');

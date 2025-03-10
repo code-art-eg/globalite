@@ -22,3 +22,6 @@ export { getDayName } from './get-day-name';
 export { durationFormatter } from './duration-formatter';
 
 export type { Country } from './get-country-name';
+
+export type { DateOnly } from './date-only';
+export { isDateOnly } from './date-only';
