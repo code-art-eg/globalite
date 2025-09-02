@@ -7,9 +7,8 @@ on:
     workflow_dispatch:
 
 jobs:
-    test:
+    publish:
         runs-on: ubuntu-latest
-
         steps:
             -   name: Checkout repository
                 uses: actions/checkout@v3
@@ -37,18 +36,16 @@ jobs:
                 run: pnpm build
 
             -   name: Publish to npmjs registry
-                run: pnpm publish --access public
+                run: yarn publish --provenance --access public --non-interactive
                 working-directory: ./build
                 env:
                     NODE_AUTH_TOKEN: ${{ secrets.NPMJS_PUBLISH_TOKEN }}
-                    CI: true
 
             -   name: Configure npm for GitHub Packages
                 run: echo "//npm.pkg.github.com/:_authToken=${{ secrets.NPM_GITHUB_PUBLISH_TOKEN }}" >> ~/.npmrc
 
             -   name: Publish to github npm registry
-                run: pnpm publish --access public --registry https://npm.pkg.github.com/
+                run: yarn publish --provenance --access public --registry https://npm.pkg.github.com/ --non-interactive
                 working-directory: ./build
                 env:
                     NODE_AUTH_TOKEN: ${{ secrets.NPM_GITHUB_PUBLISH_TOKEN }}
-                    CI: true
