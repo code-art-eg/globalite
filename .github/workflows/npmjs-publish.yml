@@ -47,7 +47,7 @@ jobs:
                 run: echo "//npm.pkg.github.com/:_authToken=${{ secrets.NPM_GITHUB_PUBLISH_TOKEN }}" >> ~/.npmrc
 
             -   name: Publish to github npm registry
-                run: pnpm publish --access public --registry https://npm.pkg.github.com/ --non-interactive
+                run: pnpm publish --access public --registry https://npm.pkg.github.com/
                 working-directory: ./build
                 env:
                     NODE_AUTH_TOKEN: ${{ secrets.NPM_GITHUB_PUBLISH_TOKEN }}
