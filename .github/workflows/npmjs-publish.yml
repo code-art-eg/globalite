@@ -1,47 +1,54 @@
 name: Publish to npmjs
 
 on:
-  push:
-    branches:
-      - main
-  workflow_dispatch:
+    push:
+        branches:
+            - main
+    workflow_dispatch:
 
 jobs:
-  test:
-    runs-on: ubuntu-latest
+    test:
+        runs-on: ubuntu-latest
 
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v3
-        with:
-            fetch-depth: 0  # Fetch all history for all tags and branches
+        steps:
+            -   name: Checkout repository
+                uses: actions/checkout@v3
+                with:
+                    fetch-depth: 0  # Fetch all history for all tags and branches
 
-      - name: Set up Node.js
-        uses: actions/setup-node@v3
-        with:
-          node-version: '22'
-          registry-url: https://registry.npmjs.org/
+            -   name: Set up Node.js
+                uses: actions/setup-node@v3
+                with:
+                    node-version: '22'
+                    registry-url: https://registry.npmjs.org/
 
-      - name: Install dependencies
-        run: yarn install --frozen-lockfile
+            -   name: Install pnpm
+                uses: pnpm/action-setup@v4
+                with:
+                    version: 10
 
-      - name: Run tests
-        run: yarn test
+            -   name: Install dependencies
+                run: pnpm install --frozen-lockfile
 
-      - name: Build project
-        run: yarn build
+            -   name: Run tests
+                run: pnpm test
 
-      - name: Publish to npmjs registry
-        run: yarn publish --provenance --access public --non-interactive
-        working-directory: ./build
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPMJS_PUBLISH_TOKEN }}
+            -   name: Build project
+                run: pnpm build
 
-      - name: Configure npm for GitHub Packages
-        run: echo "//npm.pkg.github.com/:_authToken=${{ secrets.NPM_GITHUB_PUBLISH_TOKEN }}" >> ~/.npmrc
+            -   name: Publish to npmjs registry
+                run: pnpm publish --provenance --access public
+                working-directory: ./build
+                env:
+                    NODE_AUTH_TOKEN: ${{ secrets.NPMJS_PUBLISH_TOKEN }}
+                    CI: true
 
-      - name: Publish to github npm registry
-        run: yarn publish --provenance --access public --registry https://npm.pkg.github.com/ --non-interactive
-        working-directory: ./build
-        env:
-            NODE_AUTH_TOKEN: ${{ secrets.NPM_GITHUB_PUBLISH_TOKEN }}
+            -   name: Configure npm for GitHub Packages
+                run: echo "//npm.pkg.github.com/:_authToken=${{ secrets.NPM_GITHUB_PUBLISH_TOKEN }}" >> ~/.npmrc
+
+            -   name: Publish to github npm registry
+                run: pnpm publish --provenance --access public --registry https://npm.pkg.github.com/ --non-interactive
+                working-directory: ./build
+                env:
+                    NODE_AUTH_TOKEN: ${{ secrets.NPM_GITHUB_PUBLISH_TOKEN }}
+                    CI: true

@@ -7,7 +7,9 @@
 		"url": "https://github.com/code-art-eg/globalite.git"
 	},
 	"engines": {
-		"yarn": ">=1.22.4 <2",
+		"pnpm": ">=10.14.0",
+		"yarn": ">=1.22.0",
+		"node": ">=22.0.0",
 		"npm": "Please use yarn instead of NPM to install dependencies"
 	},
 	"bugs": "https://github.com/code-art-eg/globalite/issues",
@@ -22,22 +24,30 @@
 		"playground": "node --import tsx/esm playground/index.ts",
 		"gen-boolean": "node --import tsx/esm tools/gen-boolean-data/index.ts"
 	},
-	"dependencies": {},
 	"devDependencies": {
-		"@eslint/js": "^9.22.0",
-		"@types/node": "^22.13.9",
-		"cldr-core": "^46.1.0",
-		"cldr-misc-full": "^46.1.0",
-		"cpy-cli": "^5.0.0",
-		"eslint": "^9.22.0",
-		"prettier": "^3.5.3",
+		"@eslint/js": "^9.34.0",
+		"@types/node": "^24.3.0",
+		"cpy-cli": "^6.0.0",
+		"eslint": "^9.34.0",
+		"prettier": "^3.6.2",
 		"rimraf": "^6.0.1",
-		"tsx": "^4.19.3",
-		"typedoc": "^0.27.9",
-		"typescript": "^5.8.2",
-		"typescript-eslint": "^8.26.0"
+		"tsx": "^4.20.5",
+		"typedoc": "^0.28.12",
+		"typescript": "^5.9.2",
+		"typescript-eslint": "^8.41.0"
 	},
 	"private": false,
 	"type": "module",
-	"keywords": ["globalization", "globalite", "globalize", "intl", "i18n", "l10n", "parsing", "formatting", "dates", "numbers"]
+	"keywords": [
+		"globalization",
+		"globalite",
+		"globalize",
+		"intl",
+		"i18n",
+		"l10n",
+		"parsing",
+		"formatting",
+		"dates",
+		"numbers"
+	]
 }
