@@ -1,6 +1,6 @@
 {
 	"compilerOptions": {
-		"target": "es2016",
+		"target": "es2022",
 		"module": "ES2022",
 		"forceConsistentCasingInFileNames": true,
 		"strict": true,
@@ -11,7 +11,5 @@
 			"@code-art-eg/globalite": ["./src/index"]
 		}
 	},
-	"include": [
-		"src"
-	]
+	"include": ["src"]
 }
